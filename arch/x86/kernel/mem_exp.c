@@ -12,24 +12,9 @@
 //#define PAGE_SHIFT      12
 //#define PAGE_SIZE       (_AC(1,UL) << PAGE_SHIFT)
 //#define PAGE_MASK       (~(PAGE_SIZE-1))
-/*
-int get_path_name(const struct path *path, char *buf, size_t size)
-{
-	const char esc = '\n';
-	int res = -1;
-	if (size) {
-		char *p = d_path(path, buf, size);
-		if (!IS_ERR(p)) {
-			char *end = mangle_path(buf, p, esc);
-			if (end)
-				res = end - buf;
-		}
-	}
-	return res;
-}*/
 void vma_read(struct vm_area_struct *vma, struct task_struct *tk)
 {
-  int is_pid = 1;
+	int is_pid = 1;
 	struct mm_struct *mm = vma->vm_mm;
 	struct file *file = vma->vm_file;
 	//struct proc_maps_private *priv = m->private;
@@ -75,10 +60,11 @@ void vma_read(struct vm_area_struct *vma, struct task_struct *tk)
 	if (file) {
 		//pad_len_spaces(m, len);
 		//seq_path(m, &file->f_path, "\n");
-		size_t size = 20;
-		char *buf = (char *)kmalloc(sizeof(char) * size, GFP_KERNEL);
-		get_path_name(&file->f_path, buf, size);
-		printk("%s\n", buf);
+		//size_t size = 20;
+		//char *buf = (char *)kmalloc(sizeof(char) * size, GFP_KERNEL);
+		//get_path_name(&file->f_path, buf, size);
+		
+		printk("%s", vma->vm_file->f_dentry->d_name.name );
 		//kfree(buf);
 		goto done;
 	}
@@ -146,17 +132,22 @@ asmlinkage long sys_linux_survey_TT(int pid, char* mem_data) {
             printk ("Error: mm_struct *mm does not exists!!\n");
             return 4;
         }
-	struct vm_area_struct *vma = mms->mmap;
-	if (!vma) {
-            printk ("Error: mm_struct *vma does not exists!!\n");
-            return 4;
-        }
+	struct vm_area_struct *vma;
 	//find task by virtual pid!
 	//struct mm_struct *mm = find_task_by_vpid(pid)->mm;
-  while(vma->vm_next)
-  {
-    vma_read(vma, tk);
-    vma = vma->vm_next;
-  }
+	struct page *page;
+	long pgframe_addr, vm_address;
+	for (vma = mms->mmap;vma;vma = vma->vm_next)
+	{
+		vma_read(vma, tk);
+		//printk("page frames: ");
+		for (vm_address = vma->vm_start;vm_address < vma->vm_end;vm_address += PAGE_SIZE)
+		{
+			page = follow_page(vma, vm_address, 0);
+			pgframe_addr = page_to_phys(page);
+			printk("0x%x ", pgframe_addr);
+		}
+		
+	}
         return 0;
 }
