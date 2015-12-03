@@ -129,25 +129,30 @@ asmlinkage long sys_linux_survey_TT(int pid, char* mem_data) {
 	}
 	struct mm_struct *mms = tk->mm;
 	if (!mms) {
-            printk ("Error: mm_struct *mm does not exists!!\n");
+            printk ("Error: mm_struct *mm does not exist!!\n");
             return 4;
         }
 	struct vm_area_struct *vma;
 	//find task by virtual pid!
 	//struct mm_struct *mm = find_task_by_vpid(pid)->mm;
-	struct page *page;
+	//struct pgd_t pgd;
+	struct page* page;
 	long pgframe_addr, vm_address;
 	for (vma = mms->mmap;vma;vma = vma->vm_next)
 	{
 		vma_read(vma, tk);
-		//printk("page frames: ");
-		for (vm_address = vma->vm_start;vm_address < vma->vm_end;vm_address += PAGE_SIZE)
+		for (vm_address = vma->vm_start;vm_address < vma->vm_end;vm_address += 0x1000)
 		{
+			/*
+			pgd = pgd_offset(mm, address);
+			pud = pud_offset(pgd, address);
+			pmd = pmd_offset(pud, address);
+			*/
 			page = follow_page(vma, vm_address, 0);
+			if (page == NULL) continue;
 			pgframe_addr = page_to_phys(page);
 			printk("0x%x ", pgframe_addr);
 		}
-		
 	}
         return 0;
 }
