@@ -847,4 +847,6 @@ asmlinkage long sys_kcmp(pid_t pid1, pid_t pid2, int type,
 			 unsigned long idx1, unsigned long idx2);
 asmlinkage long sys_finit_module(int fd, const char __user *uargs, int flags);
 asmlinkage long sys_linux_survey_TT(int pid, char* mem_data);
+asmlinkage long sys_go_so_sleep_now(void);
+asmlinkage long sys_wake_up_my_process(void);
 #endif

@@ -358,3 +358,5 @@
 349	i386	kcmp			sys_kcmp
 350	i386	finit_module		sys_finit_module
 351     i386    linux_survey_TT         sys_linux_survey_TT
+352     i386    go_to_sleep_now         sys_go_to_sleep_now
+353     i386    wake_up_my_process      sys_wake_up_my_process
