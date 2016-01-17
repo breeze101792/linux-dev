@@ -20,7 +20,18 @@ asmlinkage long sys_go_to_sleep_now() {
 	printk("finished!\n");
         return 0;
 }
-asmlinkage long sys_wake_up_my_process() {
+asmlinkage long sys_wake_up_my_process(int pid) {
+	struct task_struct *tk = pid_task(find_get_pid(pid), PIDTYPE_PID);
 	printk("wake_up_my_process");
+	if (!queue_flag)
+	{
+		printk("wake up");
+		set_tsk_thread_flag(tk,TIF_SIGPENDING);
+		wake_up_interruptible(&wq);
+	}
+	else
+	{
+		printk("no wait queue define");
+	}
         return 0;
 }
